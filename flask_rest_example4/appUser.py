@@ -51,6 +51,11 @@ class UserRegister(Resource):
     def post(self):
         request_data = UserRegister.parser.parse_args()
 
+        
+
+        if User.find_by_username(request_data['username']):
+            return {'message':'This username has already been taken'}, 400
+
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
