@@ -1,6 +1,3 @@
-
-from multiprocessing import connection
-import re
 import sqlite3
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required
@@ -11,7 +8,8 @@ class Item(Resource):
     parser.add_argument('price', type=float, required = True, help='Field cannot be left blank')
     parser.add_argument('name', type=str, required = False, help='Field cannot be left blank')
     
-    def find_item_by_name(self, name):
+    @classmethod
+    def find_item_by_name(cls, name):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
@@ -25,9 +23,23 @@ class Item(Resource):
         else:
             return None
     
+    @classmethod
+    def insert(cls, item):
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        query = "INSERT INTO items VALUES (?, ?)"
+        cursor.execute(query, (item['name'], item['price']))
+        connection.commit()
+        connection.close()
+
+
     @jwt_required()
     def get(self, name):
-        item = self.find_item_by_name(name)
+        try:
+            item = self.find_item_by_name(name)
+        except:
+            return {'message': 'An error occured while searching for the item.'}, 500
 
         if item:
             return {'item': {'name': item[0], 'price':item[1]}}
@@ -41,21 +53,20 @@ class Item(Resource):
         if item:
             return {'message': 'There is an item with the same name.'}, 404
 
-
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-
         item = {'name': name, 'price': request_data['price']}
-
-        query = "INSERT INTO items VALUES (?, ?)"
-        cursor.execute(query, (item['name'], item['price']))
-        connection.commit()
-        connection.close()
+        try:
+            self.insert(item)
+        except:
+            return {'message': 'An error occured while inserting the item.'}, 500
 
         return item, 201
 
     def delete(self, name):
-        item = self.find_item_by_name(name)
+        try:
+            item = self.find_item_by_name(name)
+        except:
+            return {'message': 'An error occured while searching for the item.'}, 500
+
         if item:
             connection = sqlite3.connect('data.db')
             cursor = connection.cursor()
@@ -71,7 +82,11 @@ class Item(Resource):
         
 
     def put(self, name):
-        item = self.find_item_by_name(name)
+        try:
+            item = self.find_item_by_name(name)
+        except:
+            return {'message': 'An error occured while searching for the item.'}, 500
+
         if not item:
             return {'message': 'There isn\'t an item with the same name.'}, 404
 
@@ -95,4 +110,5 @@ class ItemList(Resource):
             query = "SELECT * FROM items"
             result = cursor.execute(query)
             items = result.fetchall()
+            connection.close()
             return {'items': items}, 201
