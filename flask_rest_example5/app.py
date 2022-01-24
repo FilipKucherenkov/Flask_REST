@@ -8,6 +8,7 @@ from resources.item import Item, ItemList
 from db import db
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = "2201"
 api = Api(app)
 
