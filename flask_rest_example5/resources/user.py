@@ -14,14 +14,8 @@ class UserRegister(Resource):
         if UserModel.find_by_username(request_data['username']):
             return {'message':'This username has already been taken'}, 400
 
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-
-        query = "INSERT INTO users VALUES (NULL, ?, ?)"
-        cursor.execute(query,(request_data['username'], request_data['password'],))
-
-        connection.commit()
-        connection.close()
-
+        newUser = UserModel(request_data['username'], request_data['password'])
+        newUser.save_to_db()
+        
         return {'message':'the user was created successfully'}, 201
         

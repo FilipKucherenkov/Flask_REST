@@ -17,34 +17,13 @@ class ItemModel(db.Model):
 
     @classmethod
     def find_item_by_name(cls, name):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
+        return ItemModel.query.filter_by(name = name).first()
 
-        query = "SELECT * FROM items WHERE name=?"
-        result = cursor.execute(query, (name,))
-        item = result.fetchone()
-        connection.close()
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
 
-        if item:
-            return cls(*item)
-        else:
-            return None
-    
+    def delete_from_db(self):
+        db.session.delete(self)
+        db.session.commit()
 
-    def insert(self):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-
-        query = "INSERT INTO items VALUES (?, ?)"
-        cursor.execute(query, (self.name, self.price))
-        connection.commit()
-        connection.close()
-    
-    def update(self,newName):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-
-        query = 'UPDATE items SET name = ?, price = ? WHERE name=?'
-        cursor.execute(query, (newName ,self.price,  self.name ))
-        connection.commit()
-        connection.close()
