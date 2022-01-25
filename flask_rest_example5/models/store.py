@@ -15,7 +15,7 @@ class StoreModel(db.Model):
         return {'name': self.name, 'items': [item.json() for item in self.items.all()]}
 
     @classmethod
-    def find_item_by_name(cls, name):
+    def find_store_by_name(cls, name):
         return StoreModel.query.filter_by(name = name).first()
 
     def save_to_db(self):

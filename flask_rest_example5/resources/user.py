@@ -1,4 +1,3 @@
-import sqlite3
 from flask_restful import Resource, reqparse
 from models.user import UserModel
 
@@ -14,8 +13,8 @@ class UserRegister(Resource):
         if UserModel.find_by_username(request_data['username']):
             return {'message':'This username has already been taken'}, 400
 
-        newUser = UserModel(request_data['username'], request_data['password'])
+        newUser = UserModel(NULL,request_data['username'], request_data['password'])
         newUser.save_to_db()
-        
+
         return {'message':'the user was created successfully'}, 201
         

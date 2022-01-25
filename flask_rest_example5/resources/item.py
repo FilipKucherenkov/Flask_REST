@@ -7,7 +7,7 @@ class Item(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('price', type=float, required = True, help='Field cannot be left blank')
     parser.add_argument('name', type=str, required = False, help='Field cannot be left blank')
-    parser.add_argument('store_id', type=int, required = False, help='Field cannot be left blank')
+    parser.add_argument('store_id', type=int, required = True, help='Field cannot be left blank')
 
     @jwt_required()
     def get(self, name):
