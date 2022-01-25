@@ -7,7 +7,8 @@ class Item(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('price', type=float, required = True, help='Field cannot be left blank')
     parser.add_argument('name', type=str, required = False, help='Field cannot be left blank')
-    
+    parser.add_argument('store_id', type=int, required = False, help='Field cannot be left blank')
+
     @jwt_required()
     def get(self, name):
         try:
@@ -27,7 +28,7 @@ class Item(Resource):
         if item:
             return {'message': 'There is an item with the same name.'}, 404
 
-        item = ItemModel(name,request_data['price'])
+        item = ItemModel(name,request_data['price'], request_data['store_id'])
         try:
             item.save_to_db()
         except:
@@ -50,10 +51,11 @@ class Item(Resource):
         
 
         if not item:
-            item = ItemModel(name, request_data['price'])
+            item = ItemModel(name, request_data['price'], request_data['store_id'])
             # return {'message': 'There isn\'t an item with the same name.'}, 404
         else:
             item.price = request_data['price']
+            item.store_id = request_data['store_id']
         
         item.save_to_db() 
         return item.json(), 201

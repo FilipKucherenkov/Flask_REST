@@ -7,10 +7,13 @@ from resources.item import Item, ItemList
 
 from db import db
 
+#Create initial flask app.
 app = Flask(__name__)
 
+#DB configurations
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db' # can be any db
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # use SQLAlchemy's way of tracking modifications.
+
 app.secret_key = "2201"
 api = Api(app)
 
@@ -19,10 +22,13 @@ def create_tables():
     db.create_all()
 
 jwt = JWT(app, authenticate, identity)
+
+#Resources 
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(ItemList, '/items')
 api.add_resource(UserRegister, '/register')
 
+#This only runs if this file is being run initially
 if __name__ == '__main__':
     db.init_app(app)
     app.run(port=5000, debug=True)
